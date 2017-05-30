@@ -32,6 +32,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>DS18B20</name>
+			<type>2</type>
+			<locationURI>PROJECT_LOC/DS18B20</locationURI>
+		</link>
+		<link>
 			<name>core/core</name>
 			<type>2</type>
 			<location>/home/ipaev/arduino-1.8.2/hardware/esp8266com/esp8266/cores/esp8266</location>
@@ -52,6 +57,11 @@
 			<location>/home/ipaev/arduino-1.8.2/hardware/esp8266com/esp8266/libraries/DNSServer</location>
 		</link>
 		<link>
+			<name>libraries/DallasTemperature</name>
+			<type>2</type>
+			<location>/home/ipaev/Arduino/libraries/DallasTemperature</location>
+		</link>
+		<link>
 			<name>libraries/ESP8266WebServer</name>
 			<type>2</type>
 			<location>/home/ipaev/arduino-1.8.2/hardware/esp8266com/esp8266/libraries/ESP8266WebServer</location>
@@ -60,6 +70,11 @@
 			<name>libraries/ESP8266WiFi</name>
 			<type>2</type>
 			<location>/home/ipaev/arduino-1.8.2/hardware/esp8266com/esp8266/libraries/ESP8266WiFi</location>
+		</link>
+		<link>
+			<name>libraries/OneWire</name>
+			<type>2</type>
+			<location>/home/ipaev/source/arduino/library/OneWire</location>
 		</link>
 		<link>
 			<name>libraries/PubSubClient</name>

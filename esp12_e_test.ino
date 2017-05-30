@@ -1,3 +1,5 @@
+#include "ds18b20.hpp"
+
 #include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
 
 //needed for library
@@ -49,7 +51,7 @@ void reconnect() {
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  Serial.println("\n Starting");
+  Serial.println("\n Starting GPIO2=UNUNSED");
 
   //WiFiManager
   //Local intialization. Once its business is done, there is no need to keep it around
@@ -68,9 +70,13 @@ void setup() {
   //if you get here you have connected to the WiFi
   Serial.println("connected...yeey :)");
 
+  //mqtt server start
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
   pinMode(ledPin, OUTPUT);
+  //mqtt server end
+
+  setup_temperature();
   Serial.println("exit setup");
 }
 
@@ -81,4 +87,10 @@ void loop() {
 	  reconnect();
 	 }
 	 client.loop();
+
+	 float temperature;
+	 if(!loop_temperature(&temperature)) {
+		 //valid temperature
+		 client.publish("temperature", String(temperature).c_str(), true);
+	 }
 }

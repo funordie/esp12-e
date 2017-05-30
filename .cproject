@@ -31,6 +31,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/ArduinoJson}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/PubSubClient}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/PubSubClient/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/OneWire}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/DS18B20}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/DallasTemperature}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1391762563" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -48,6 +51,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/ArduinoJson}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/PubSubClient}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/PubSubClient/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/OneWire}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/DS18B20}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/DallasTemperature}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.1919121046" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -65,6 +71,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/ArduinoJson}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/PubSubClient}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/PubSubClient/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/OneWire}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/DS18B20}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12_e_test/libraries/DallasTemperature}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.1793911553" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>
