@@ -12,14 +12,14 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
 void setup_temperature(void) {
-	  // Start up the library
-	  sensors.begin();
+	// Start up the library
+	sensors.begin();
 }
 
 int loop_temperature(float * temp) {
 
-    static long nowPrev = 0;
-    long now = millis();
+	static long nowPrev = 0;
+	long now = millis();
 	if((now - nowPrev) < DS18B20_UPDATE_TIME) return -1;
 	nowPrev = now;
 
