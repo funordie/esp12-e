@@ -18,7 +18,7 @@
 static WiFiClient espClient;
 static PubSubClient client(espClient);
 static const char* mqtt_server = "broker.mqttdashboard.com";
-static const byte ledPin = 13; // Pin with LED
+static const byte ledPin = 5; // Pin with LED
 
 void callback(char* topic, byte* payload, unsigned int length) {
 	Serial.print("Message arrived [");

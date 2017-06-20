@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>esp12_e_test</name>
+	<name>esp12-e</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -35,6 +35,16 @@
 			<name>DS18B20</name>
 			<type>2</type>
 			<locationURI>PROJECT_LOC/DS18B20</locationURI>
+		</link>
+		<link>
+			<name>mqtt</name>
+			<type>2</type>
+			<locationURI>PROJECT_LOC/mqtt</locationURI>
+		</link>
+		<link>
+			<name>wifi</name>
+			<type>2</type>
+			<locationURI>PROJECT_LOC/wifi</locationURI>
 		</link>
 		<link>
 			<name>core/core</name>
@@ -82,9 +92,25 @@
 			<location>/home/ipaev/Arduino/libraries/PubSubClient</location>
 		</link>
 		<link>
+			<name>libraries/SD</name>
+			<type>2</type>
+			<location>/home/ipaev/arduino-1.8.2/hardware/esp8266com/esp8266/libraries/SD</location>
+		</link>
+		<link>
+			<name>libraries/SPI</name>
+			<type>2</type>
+			<location>/home/ipaev/arduino-1.8.2/hardware/esp8266com/esp8266/libraries/SPI</location>
+		</link>
+		<link>
 			<name>libraries/WiFiManager</name>
 			<type>2</type>
 			<location>/home/ipaev/Arduino/libraries/WiFiManager</location>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>copy_PROJECT_LOC</name>
+			<value>$%7BPARENT-1-PROJECT_LOC%7D/esp12_e_test</value>
+		</variable>
+	</variableList>
 </projectDescription>
