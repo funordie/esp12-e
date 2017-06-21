@@ -6,8 +6,6 @@
  */
 
 #include "mqtt.hpp"
-
-
 #include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
 
 //needed for library
@@ -19,6 +17,7 @@ static WiFiClient espClient;
 static PubSubClient client(espClient);
 static const char* mqtt_server = "broker.mqttdashboard.com";
 static const byte ledPin = 5; // Pin with LED
+uint32_t chip_id;
 
 void callback(char* topic, byte* payload, unsigned int length) {
 	Serial.print("Message arrived [");
@@ -35,7 +34,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
 	Serial.println();
 }
 
-
 void reconnect() {
 	// Loop until we're reconnected
 	while (!client.connected()) {
@@ -44,7 +42,9 @@ void reconnect() {
 		if (client.connect("ESP8266 Client")) {
 			Serial.println("connected");
 			// ... and subscribe to topic
-			client.subscribe("ledStatus");
+			String str = String(chip_id) + "_" + "ledStatus";
+			Serial.println("subscribe to:" + str);
+			client.subscribe(str.c_str());
 		} else {
 			Serial.print("failed, rc=");
 			Serial.print(client.state());
@@ -55,14 +55,15 @@ void reconnect() {
 	}
 }
 
-PubSubClient * setup_mqtt() {
+void setup_mqtt() {
+	EspClass esp;
+	chip_id = esp.getChipId();
 
 	//mqtt server start
 	client.setServer(mqtt_server, 1883);
 	client.setCallback(callback);
 	pinMode(ledPin, OUTPUT);
 	//mqtt server end
-	return &client;
 }
 int loop_mqtt() {
 	if (!client.connected()) {
@@ -71,4 +72,10 @@ int loop_mqtt() {
 	client.loop();
 
 	return 0;
+}
+
+void publish_temperature_mqtt(float temp) {
+	String str = String(chip_id) + "_" + "temperature";
+	Serial.println("publish:" + str);
+	client.publish(str.c_str(), String(temp).c_str(), true);
 }

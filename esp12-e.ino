@@ -5,8 +5,8 @@
 #include <SPI.h>
 #include <SD.h>
 const int chipSelect = 10;
+float temperature;
 
-PubSubClient * client;
 void setup() {
 	// put your setup code here, to run once:
 	Serial.begin(115200);
@@ -18,10 +18,9 @@ void setup() {
 	}
 
 	setup_wifi();
-
-	client = setup_mqtt();
-
+	setup_mqtt();
 	setup_temperature();
+
 	Serial.println("exit setup");
 }
 
@@ -30,10 +29,10 @@ void loop() {
 	// put your main code here, to run repeatedly:
 	loop_mqtt();
 
-	float temperature;
 	if(!loop_temperature(&temperature)) {
 		//valid temperature
-		client->publish("temperature", String(temperature).c_str(), true);
+
+		publish_temperature_mqtt(temperature);
 
 		//write temperature
 		// open the file. note that only one file can be open at a time,

@@ -10,7 +10,7 @@
 
 #include <PubSubClient.h>
 
-PubSubClient * setup_mqtt();
+void setup_mqtt();
 int loop_mqtt();
-
+void publish_temperature_mqtt(float temp);
 #endif /* MQTT_MQTT_HPP_ */
