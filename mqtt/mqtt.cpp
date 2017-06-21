@@ -18,11 +18,34 @@ static PubSubClient client(espClient);
 static const char* mqtt_server = "broker.mqttdashboard.com";
 static const byte ledPin = 5; // Pin with LED
 static uint32_t chip_id;
-static uint32_t OnTime;
 
 static String topic_OnTime;
-static String topic_LedStatus;
+static String topic_Start;
+
+extern "C" {
+#include "user_interface.h"
+}
+
+#define ONCE 0
+#define REPEAT 1
+
+static os_timer_t delay_timer;
+
+void delay_end(void* arg) {
+	(void) arg;
+	digitalWrite(ledPin, LOW);
+}
+
+void start_OnTime_Period(unsigned long ms) {
+	Serial.println("Start OnTime:" + String(ms));
+	os_timer_disarm(&delay_timer);
+    os_timer_arm(&delay_timer, ms, ONCE);
+    digitalWrite(ledPin, HIGH);
+}
 void callback(char* topic, byte* payload, unsigned int length) {
+
+	static uint32_t OnTime;
+
 	Serial.print("Message arrived [");
 	Serial.print(topic);
 	Serial.print("] ");
@@ -36,15 +59,18 @@ void callback(char* topic, byte* payload, unsigned int length) {
 		Serial.println(str);
 		OnTime = str.toInt();
 	}
-	else if(!strcmp(topic_LedStatus.c_str(), topic)) {
+	else if(!strcmp(topic_Start.c_str(), topic)) {
 		//received topic LedStatus
 		for (unsigned int i=0;i<length;i++) {
 			char receivedChar = (char)payload[i];
 			Serial.print(receivedChar);
 			if (receivedChar == '0')
 				digitalWrite(ledPin, LOW);
-			if (receivedChar == '1')
-				digitalWrite(ledPin, HIGH);
+			if (receivedChar == '1') {
+				if(OnTime) {
+					start_OnTime_Period(OnTime);
+				}
+			}
 		}
 	}
 	Serial.println();
@@ -58,8 +84,8 @@ void reconnect() {
 		if (client.connect("ESP8266 Client")) {
 			Serial.println("connected");
 
-			Serial.println("subscribe to:" + topic_LedStatus);
-			client.subscribe(topic_LedStatus.c_str());
+			Serial.println("subscribe to:" + topic_Start);
+			client.subscribe(topic_Start.c_str());
 
 			Serial.println("subscribe to:" + topic_OnTime);
 			client.subscribe(topic_OnTime.c_str());
@@ -77,7 +103,7 @@ void setup_mqtt() {
 	EspClass esp;
 	chip_id = esp.getChipId();
 
-	topic_LedStatus = String(chip_id) + "_" + "ledStatus";
+	topic_Start = String(chip_id) + "_" + "Start";
 	topic_OnTime = String(chip_id) + "_" + "OnTime";
 
 	//mqtt server start
@@ -85,6 +111,8 @@ void setup_mqtt() {
 	client.setCallback(callback);
 	pinMode(ledPin, OUTPUT);
 	//mqtt server end
+
+    os_timer_setfn(&delay_timer, (os_timer_func_t*) &delay_end, 0);
 }
 int loop_mqtt() {
 	if (!client.connected()) {
