@@ -41,6 +41,11 @@ void start_OnTime_Period(unsigned long ms) {
 	os_timer_disarm(&delay_timer);
     os_timer_arm(&delay_timer, ms, ONCE);
     digitalWrite(ledPin, HIGH);
+
+	String str = String(chip_id) + "_" + "CommandCB";
+//	Serial.println("publish:" + str);
+	client.publish(str.c_str(), String(ms).c_str(), true);
+
 }
 void callback(char* topic, byte* payload, unsigned int length) {
 
@@ -125,6 +130,6 @@ int loop_mqtt() {
 
 void publish_temperature_mqtt(float temp) {
 	String str = String(chip_id) + "_" + "temperature";
-	Serial.println("publish:" + str);
+//	Serial.println("publish:" + str);
 	client.publish(str.c_str(), String(temp).c_str(), true);
 }

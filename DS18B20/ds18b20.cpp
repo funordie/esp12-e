@@ -29,6 +29,6 @@ int loop_temperature(float * temp) {
 		return -1;
 	}
 	*temp = res;
-	printf("Temperature:%f\n", *temp);
+//	printf("Temperature:%f\n", *temp);
 	return 0;
 }
