@@ -15,9 +15,12 @@
 #include <PubSubClient.h>
 static WiFiClient espClient;
 static PubSubClient client(espClient);
-static const char* mqtt_server = "broker.mqttdashboard.com";
+static const char* mqtt_server = "test.mosquitto.org";//"broker.mqttdashboard.com";
+static const uint16_t mqtt_port = 1883;
 static const byte ledPin = 5; // Pin with LED
-static uint32_t chip_id;
+
+static String chip_id_str;
+#define STR_ID_BASE 16
 
 static String topic_OnTime;
 static String topic_Start;
@@ -37,15 +40,17 @@ void delay_end(void* arg) {
 }
 
 void start_OnTime_Period(unsigned long ms) {
-	Serial.println("Start OnTime:" + String(ms));
+	static uint32_t count = 0;
+
+	Serial.println("Start pump with time:" + String(ms) + "[ms]");
 	os_timer_disarm(&delay_timer);
     os_timer_arm(&delay_timer, ms, ONCE);
     digitalWrite(ledPin, HIGH);
 
-	String str = String(chip_id) + "_" + "CommandCB";
-//	Serial.println("publish:" + str);
-	client.publish(str.c_str(), String(ms).c_str(), true);
-
+	String topic = chip_id_str + "_" + "CommandCB";
+	String msg = "OnTime:" + String(ms) + " count:" + String(count++);
+	Serial.println("publish: " + topic + " val:" + msg);
+	client.publish(topic.c_str(), msg.c_str() , true);
 }
 void callback(char* topic, byte* payload, unsigned int length) {
 
@@ -73,12 +78,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
 				digitalWrite(ledPin, LOW);
 			if (receivedChar == '1') {
 				if(OnTime) {
+					Serial.println();
 					start_OnTime_Period(OnTime);
 				}
 			}
 		}
 	}
-	Serial.println();
+	Serial.println("receive end");
 }
 
 void reconnect() {
@@ -106,13 +112,16 @@ void reconnect() {
 
 void setup_mqtt() {
 	EspClass esp;
-	chip_id = esp.getChipId();
+	uint32_t chip_id = esp.getChipId();
+	chip_id_str = String(chip_id, STR_ID_BASE);
+	chip_id_str.toUpperCase();
 
-	topic_Start = String(chip_id) + "_" + "Start";
-	topic_OnTime = String(chip_id) + "_" + "OnTime";
+	printf("%s: %s", __FUNCTION__, chip_id_str.c_str());
+	topic_Start = chip_id_str + "_" + "Start";
+	topic_OnTime = chip_id_str + "_" + "OnTime";
 
 	//mqtt server start
-	client.setServer(mqtt_server, 1883);
+	client.setServer(mqtt_server, mqtt_port);
 	client.setCallback(callback);
 	pinMode(ledPin, OUTPUT);
 	//mqtt server end
@@ -129,7 +138,13 @@ int loop_mqtt() {
 }
 
 void publish_temperature_mqtt(float temp) {
-	String str = String(chip_id) + "_" + "temperature";
+	String str = chip_id_str + "_" + "Temperature";
 //	Serial.println("publish:" + str);
 	client.publish(str.c_str(), String(temp).c_str(), true);
+}
+
+void publish_moisture_mqtt(uint16_t mst) {
+	String str = chip_id_str + "_" + "Moisture";
+//	Serial.println("publish:" + str);
+	client.publish(str.c_str(), String(mst).c_str(), true);
 }

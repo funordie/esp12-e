@@ -13,4 +13,5 @@
 void setup_mqtt();
 int loop_mqtt();
 void publish_temperature_mqtt(float temp);
+void publish_moisture_mqtt(uint16_t mst);
 #endif /* MQTT_MQTT_HPP_ */
