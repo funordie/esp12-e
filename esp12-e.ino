@@ -1,11 +1,13 @@
 #include "ds18b20.hpp"
 #include "mqtt.hpp"
 #include "wifi.hpp"
+#include "moisture.hpp"
 
 #include <SPI.h>
 #include <SD.h>
 const int chipSelect = 10;
-float temperature;
+static float temperature;
+static uint16_t moisture;
 
 void setup() {
 	// put your setup code here, to run once:
@@ -20,6 +22,7 @@ void setup() {
 	setup_wifi();
 	setup_mqtt();
 	setup_temperature();
+    setup_moisture();
 
 	Serial.println("exit setup");
 }
@@ -28,6 +31,11 @@ void loop() {
 
 	// put your main code here, to run repeatedly:
 	loop_mqtt();
+
+    if(!loop_moisture(&moisture)) {
+    	//publish moisture
+    	publish_moisture_mqtt(moisture);
+    }
 
 	if(!loop_temperature(&temperature)) {
 		//valid temperature
@@ -49,7 +57,7 @@ void loop() {
 		}
 		// if the file isn't open, pop up an error:
 		else {
-			Serial.println("error opening datalog.txt");
+//			Serial.println("error opening datalog.txt");
 		}
 	}
 }
