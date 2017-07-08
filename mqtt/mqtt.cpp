@@ -15,10 +15,14 @@
 #include <PubSubClient.h>
 static WiFiClient espClient;
 static PubSubClient client(espClient);
-static const char* mqtt_server = "test.mosquitto.org";//"broker.mqttdashboard.com";
-static const uint16_t mqtt_port = 1883;
-static const byte ledPin = 5; // Pin with LED
 
+//static const char* mqtt_server = "test.mosquitto.org";
+//static const char* mqtt_server = "broker.hivemq.com";
+static const char* mqtt_server = "iot.eclipse.org";
+static const uint16_t mqtt_port = 1883;
+
+static const byte pumpPin = 5; // Pin with LED
+static const uint8_t statusPin = 16;
 static String chip_id_str;
 #define STR_ID_BASE 16
 
@@ -36,7 +40,7 @@ static os_timer_t delay_timer;
 
 void delay_end(void* arg) {
 	(void) arg;
-	digitalWrite(ledPin, LOW);
+	digitalWrite(pumpPin, LOW);
 }
 
 void start_OnTime_Period(unsigned long ms) {
@@ -45,7 +49,7 @@ void start_OnTime_Period(unsigned long ms) {
 	Serial.println("Start pump with time:" + String(ms) + "[ms]");
 	os_timer_disarm(&delay_timer);
     os_timer_arm(&delay_timer, ms, ONCE);
-    digitalWrite(ledPin, HIGH);
+    digitalWrite(pumpPin, HIGH);
 
 	String topic = chip_id_str + "_" + "CommandCB";
 	String msg = "OnTime:" + String(ms) + " count:" + String(count++);
@@ -75,7 +79,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 			char receivedChar = (char)payload[i];
 			Serial.print(receivedChar);
 			if (receivedChar == '0')
-				digitalWrite(ledPin, LOW);
+				digitalWrite(pumpPin, LOW);
 			if (receivedChar == '1') {
 				if(OnTime) {
 					Serial.println();
@@ -123,15 +127,18 @@ void setup_mqtt() {
 	//mqtt server start
 	client.setServer(mqtt_server, mqtt_port);
 	client.setCallback(callback);
-	pinMode(ledPin, OUTPUT);
+	pinMode(pumpPin, OUTPUT);
+	pinMode(statusPin, OUTPUT);
 	//mqtt server end
 
     os_timer_setfn(&delay_timer, (os_timer_func_t*) &delay_end, 0);
 }
 int loop_mqtt() {
 	if (!client.connected()) {
+		digitalWrite(statusPin, LOW);
 		reconnect();
 	}
+	digitalWrite(statusPin, HIGH);
 	client.loop();
 
 	return 0;
