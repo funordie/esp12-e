@@ -8,8 +8,7 @@
 #include <Arduino.h>
 #include "moisture.hpp"
 
-#define ADC_MAX 1023
-#define PROBE_PIN 0
+#define PROBE_PIN A0
 #define MOISTURE_UPDATE_TIME 5000
 
 void setup_moisture() {
@@ -23,7 +22,6 @@ int loop_moisture(uint16_t * mst) {
 	nowPrev = now;
 
 	*mst = (uint16_t)analogRead(PROBE_PIN);
-    *mst = ADC_MAX - *mst;
     return 0;
 }
 
