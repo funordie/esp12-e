@@ -3,13 +3,20 @@
 #include "wifi.hpp"
 #include "moisture.hpp"
 
+#include "common.h"
+
 #include <SPI.h>
 #include <SD.h>
 const int chipSelect = 10;
 static float temperature;
 static uint16_t moisture;
 
+extern volatile uint8_t ontime_running;
+
 void setup() {
+
+	uint32_t chip_id = ESP.getChipId();
+
 	// put your setup code here, to run once:
 	Serial.begin(115200);
 	Serial.println("\n Starting...");
@@ -20,7 +27,7 @@ void setup() {
 	}
 
 	setup_wifi();
-	setup_mqtt();
+	setup_mqtt(chip_id);
 	setup_temperature();
     setup_moisture();
 
@@ -28,7 +35,6 @@ void setup() {
 }
 
 void loop() {
-
 	// put your main code here, to run repeatedly:
 	loop_mqtt();
 
@@ -60,4 +66,15 @@ void loop() {
 //			Serial.println("error opening datalog.txt");
 		}
 	}
+
+	static uint32_t count = 0;
+	if(count >= 10 && ontime_running == 0) {
+		mqtt_deinit();
+		wifi_deinit();
+
+		Serial.println("deep sleep: start");
+		ESP.deepSleep(SLEEPING_TIME_IN_SECONDS * 1000*1000, WAKE_RF_DEFAULT);
+		delay(500); // wait for deep sleep to happen
+	}
+	count++;
 }

@@ -22,12 +22,13 @@ static const char* mqtt_server = "iot.eclipse.org";
 static const uint16_t mqtt_port = 1883;
 
 static const byte pumpPin = 5; // Pin with LED
-static const uint8_t statusPin = 16;
+static const uint8_t statusPin = 14;
 static String chip_id_str;
 #define STR_ID_BASE 16
 
 static String topic_OnTime;
 static String topic_Start;
+static String topic_CommandCB;
 
 extern "C" {
 #include "user_interface.h"
@@ -37,56 +38,86 @@ extern "C" {
 #define REPEAT 1
 
 static os_timer_t delay_timer;
+volatile uint8_t ontime_running = 0;
 
+static void mqtt_subscribe() {
+	Serial.println("subscribe to:" + topic_OnTime);
+	client.subscribe(topic_OnTime.c_str());
+
+	Serial.println("subscribe to:" + topic_Start);
+	client.subscribe(topic_Start.c_str());
+
+	Serial.println("subscribe to:" + topic_CommandCB);
+	client.subscribe(topic_CommandCB.c_str());
+}
+
+static void mqtt_unsubscribe() {
+	Serial.println("unsubscribe to:" + topic_Start);
+	client.unsubscribe(topic_Start.c_str());
+
+	Serial.println("unsubscribe to:" + topic_OnTime);
+	client.unsubscribe(topic_OnTime.c_str());
+
+	Serial.println("unsubscribe to:" + topic_CommandCB);
+	client.unsubscribe(topic_CommandCB.c_str());
+}
 void delay_end(void* arg) {
 	(void) arg;
+	ontime_running = 0;
 	digitalWrite(pumpPin, LOW);
 }
 
 void start_OnTime_Period(unsigned long ms) {
 	static uint32_t count = 0;
-
+	ontime_running = 1;
 	Serial.println("Start pump with time:" + String(ms) + "[ms]");
 	os_timer_disarm(&delay_timer);
     os_timer_arm(&delay_timer, ms, ONCE);
     digitalWrite(pumpPin, HIGH);
 
-	String topic = chip_id_str + "_" + "CommandCB";
-	String msg = "OnTime:" + String(ms) + " count:" + String(count++);
-	Serial.println("publish: " + topic + " val:" + msg);
-	client.publish(topic.c_str(), msg.c_str() , true);
+    //TODO: save count values between resets
+	String msg = "OnTime:" + String(ms) + " count:" + String(++count);
+	Serial.println("publish: " + topic_CommandCB + " val:" + msg);
+	client.publish(topic_CommandCB.c_str(), msg.c_str() , true);
 }
 void callback(char* topic, byte* payload, unsigned int length) {
 
-	static uint32_t OnTime;
+	static uint32_t OnTime, Start;
 
 	Serial.print("Message arrived [");
 	Serial.print(topic);
-	Serial.print("] ");
+	Serial.print("] value: ");
+
+	String str;
+	for (unsigned int i=0;i<length;i++) {
+		str += (char)payload[i];
+	}
+	Serial.println(str);
 
 	if(!strcmp(topic_OnTime.c_str(), topic)) {
 		//received topic OnTime
-		String str;
-		for (unsigned int i=0;i<length;i++) {
-			str += (char)payload[i];
-		}
-		Serial.println(str);
 		OnTime = str.toInt();
 	}
 	else if(!strcmp(topic_Start.c_str(), topic)) {
 		//received topic LedStatus
-		for (unsigned int i=0;i<length;i++) {
-			char receivedChar = (char)payload[i];
-			Serial.print(receivedChar);
-			if (receivedChar == '0')
-				digitalWrite(pumpPin, LOW);
-			if (receivedChar == '1') {
-				if(OnTime) {
-					Serial.println();
-					start_OnTime_Period(OnTime);
-				}
-			}
+		if(str.toInt() == 1) {
+			Start = 1;
 		}
+		else {
+			Start = 0;
+		}
+	}
+//    else if(!strcmp(topic_CommandCB.c_str(), topic)) {
+//    	//received topic CommandCB
+//    	const char * ontime_str = strstr(str.c_str(), "OnTime:");
+//    	const char * count_str = strstr(str.c_str(), "count:");
+//    	Serial.println("found string OnTime:" + String(ontime_str) + " count:" + String(count_str));
+//    }
+
+	//process command
+	if(Start == 1 && OnTime > 0) {
+		start_OnTime_Period(OnTime);
+		client.publish(topic_Start.c_str(), "0", true);
 	}
 	Serial.println("receive end");
 }
@@ -99,11 +130,7 @@ void reconnect() {
 		if (client.connect("ESP8266 Client")) {
 			Serial.println("connected");
 
-			Serial.println("subscribe to:" + topic_Start);
-			client.subscribe(topic_Start.c_str());
-
-			Serial.println("subscribe to:" + topic_OnTime);
-			client.subscribe(topic_OnTime.c_str());
+			mqtt_subscribe();
 		} else {
 			Serial.print("failed, rc=");
 			Serial.print(client.state());
@@ -114,19 +141,21 @@ void reconnect() {
 	}
 }
 
-void setup_mqtt() {
-	EspClass esp;
-	uint32_t chip_id = esp.getChipId();
+void setup_mqtt(uint32_t chip_id) {
 	chip_id_str = String(chip_id, STR_ID_BASE);
 	chip_id_str.toUpperCase();
 
 	printf("%s: %s", __FUNCTION__, chip_id_str.c_str());
 	topic_Start = chip_id_str + "_" + "Start";
 	topic_OnTime = chip_id_str + "_" + "OnTime";
+	topic_CommandCB = chip_id_str + "_" + "CommandCB";
 
 	//mqtt server start
 	client.setServer(mqtt_server, mqtt_port);
 	client.setCallback(callback);
+
+	mqtt_subscribe();
+
 	pinMode(pumpPin, OUTPUT);
 	pinMode(statusPin, OUTPUT);
 	//mqtt server end
@@ -154,4 +183,12 @@ void publish_moisture_mqtt(uint16_t mst) {
 	String str = chip_id_str + "_" + "Moisture";
 //	Serial.println("publish:" + str);
 	client.publish(str.c_str(), String(mst).c_str(), true);
+}
+
+void mqtt_deinit() {
+
+    mqtt_unsubscribe();
+
+	Serial.println("mqtt: disconnect:");
+	client.disconnect();
 }

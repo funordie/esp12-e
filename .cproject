@@ -40,6 +40,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12-e/mqtt}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12-e/wifi}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12-e/moisture}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12-e/common}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1391762563" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -66,6 +67,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12-e/mqtt}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12-e/wifi}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12-e/moisture}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12-e/common}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.1919121046" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -92,6 +94,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12-e/mqtt}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12-e/wifi}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12-e/moisture}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp12-e/common}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.1793911553" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>

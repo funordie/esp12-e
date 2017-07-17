@@ -37,6 +37,11 @@
 			<locationURI>PROJECT_LOC/DS18B20</locationURI>
 		</link>
 		<link>
+			<name>common</name>
+			<type>2</type>
+			<locationURI>PROJECT_LOC/common</locationURI>
+		</link>
+		<link>
 			<name>mqtt</name>
 			<type>2</type>
 			<locationURI>PROJECT_LOC/mqtt</locationURI>

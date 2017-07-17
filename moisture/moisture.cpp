@@ -16,10 +16,13 @@ void setup_moisture() {
 }
 
 int loop_moisture(uint16_t * mst) {
+
+	static uint8_t init = 0;
 	static long nowPrev = 0;
 	long now = millis();
-	if((now - nowPrev) < MOISTURE_UPDATE_TIME) return -1;
+	if(init && ((now - nowPrev) < MOISTURE_UPDATE_TIME)) return -1;
 	nowPrev = now;
+    init = 1;
 
 	*mst = (uint16_t)analogRead(PROBE_PIN);
     return 0;

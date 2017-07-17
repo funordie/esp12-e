@@ -18,16 +18,22 @@ void setup_temperature(void) {
 
 int loop_temperature(float * temp) {
 
+	static uint8_t init = 0;
 	static long nowPrev = 0;
 	long now = millis();
-	if((now - nowPrev) < DS18B20_UPDATE_TIME) return -1;
-	nowPrev = now;
+
+	if(init && ((now - nowPrev) < DS18B20_UPDATE_TIME)) return -1;
 
 	sensors.requestTemperatures(); // Send the command to get temperature
 	float res = sensors.getTempCByIndex(0);
 	if(res == DEVICE_DISCONNECTED_C) {
 		return -1;
 	}
+	else {
+		init = 1;
+		nowPrev = now;
+	}
+
 	*temp = res;
 //	printf("Temperature:%f\n", *temp);
 	return 0;
