@@ -29,6 +29,9 @@ static String chip_id_str;
 static String topic_OnTime;
 static String topic_Start;
 static String topic_CommandCB;
+static String topic_Count;
+
+static uint32_t Count;
 
 extern "C" {
 #include "user_interface.h"
@@ -49,6 +52,9 @@ static void mqtt_subscribe() {
 
 	Serial.println("subscribe to:" + topic_CommandCB);
 	client.subscribe(topic_CommandCB.c_str());
+
+	Serial.println("subscribe to:" + topic_Count);
+	client.subscribe(topic_Count.c_str());
 }
 
 static void mqtt_unsubscribe() {
@@ -60,6 +66,9 @@ static void mqtt_unsubscribe() {
 
 	Serial.println("unsubscribe to:" + topic_CommandCB);
 	client.unsubscribe(topic_CommandCB.c_str());
+
+	Serial.println("unsubscribe to:" + topic_Count);
+	client.unsubscribe(topic_Count.c_str());
 }
 void delay_end(void* arg) {
 	(void) arg;
@@ -68,17 +77,16 @@ void delay_end(void* arg) {
 }
 
 void start_OnTime_Period(unsigned long ms) {
-	static uint32_t count = 0;
 	ontime_running = 1;
 	Serial.println("Start pump with time:" + String(ms) + "[ms]");
 	os_timer_disarm(&delay_timer);
     os_timer_arm(&delay_timer, ms, ONCE);
     digitalWrite(pumpPin, HIGH);
 
-    //TODO: save count values between resets
-	String msg = "OnTime:" + String(ms) + " count:" + String(++count);
+	String msg = "OnTime:" + String(ms) + " count:" + String(Count);
 	Serial.println("publish: " + topic_CommandCB + " val:" + msg);
 	client.publish(topic_CommandCB.c_str(), msg.c_str() , true);
+
 }
 void callback(char* topic, byte* payload, unsigned int length) {
 
@@ -107,12 +115,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
 			Start = 0;
 		}
 	}
-//    else if(!strcmp(topic_CommandCB.c_str(), topic)) {
-//    	//received topic CommandCB
-//    	const char * ontime_str = strstr(str.c_str(), "OnTime:");
-//    	const char * count_str = strstr(str.c_str(), "count:");
-//    	Serial.println("found string OnTime:" + String(ontime_str) + " count:" + String(count_str));
-//    }
+    else if(!strcmp(topic_Count.c_str(), topic)) {
+    	//received topic CommandCB
+    	Count = str.toInt();
+    }
 
 	//process command
 	if(Start == 1 && OnTime > 0) {
@@ -149,6 +155,7 @@ void setup_mqtt(uint32_t chip_id) {
 	topic_Start = chip_id_str + "_" + "Start";
 	topic_OnTime = chip_id_str + "_" + "OnTime";
 	topic_CommandCB = chip_id_str + "_" + "CommandCB";
+	topic_Count = chip_id_str + "_" + "Count";
 
 	//mqtt server start
 	client.setServer(mqtt_server, mqtt_port);
@@ -186,6 +193,12 @@ void publish_moisture_mqtt(uint16_t mst) {
 }
 
 void mqtt_deinit() {
+
+	String str = String(++Count);
+	Serial.println("mqtt: publish: " + topic_Count + " val: " + str);
+	client.publish(topic_Count.c_str(), str.c_str() , true);
+
+	delay(1000);
 
     mqtt_unsubscribe();
 
